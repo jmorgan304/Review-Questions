@@ -4,9 +4,9 @@ import java.util.regex.Pattern;
 public class Question {
 	private static final String regex = "<\\d+>";
 	private static final Pattern pattern = Pattern.compile(regex);
-	private String template;
-	private String[] parsedTemplate;
-	private int numValues;
+	protected String template;
+	protected String[] parsedTemplate;
+	protected int numValues;
 	
 	
 	public static void main(String[] args) {
@@ -34,6 +34,37 @@ public class Question {
 			numMatches++;
 		}
 		return numMatches;
+	}
+	
+	public static int randomInteger(int lower, int upper) throws IllegalArgumentException {
+		int range = upper - lower;
+		if (range < 0) {
+			throw new IllegalArgumentException("Upper value must be greater than lower");
+		}
+		double randomValue = Math.random();
+		return (int)(range * randomValue + lower);
+	}
+	
+	public static double randomReal(double lower, double upper) throws IllegalArgumentException {
+		double range = upper - lower;
+		if (range < 0d) {
+			throw new IllegalArgumentException("Upper value must be greater than lower");
+		}
+		double randomValue = Math.random();
+		return range * randomValue + lower;
+	}
+	
+	public static boolean eventOccurs(double probabilityOfSuccess) throws IllegalArgumentException {
+		if (probabilityOfSuccess > 1d || probabilityOfSuccess < 0d) {
+			throw new IllegalArgumentException("Probabilities must be in [0, 1]");
+		}
+		double randomValue = Math.random();
+		if (randomValue <= probabilityOfSuccess) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	public String insertValues(String[] values) throws IllegalArgumentException {
