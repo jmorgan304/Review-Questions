@@ -6,13 +6,44 @@ public class CalculusQuestion extends Question {
 
 	public static void main(String args[]) {
 		String template = "Find the derivative of <0>";
-		String[] values = { randomIntegerPolynomial(10, 3, 2) };
+		String[] values = { exp(randomIntegerPolynomial(3, 1, 1)) };
 		CalculusQuestion cq = new CalculusQuestion(template, values);
+		System.out.println(cq);
+		cq = randomPartialDerivative(3, 1, 2);
+		System.out.println(cq);
+		cq = randomIntegral(3, 1, 2);
 		System.out.println(cq);
 	}
 
 	CalculusQuestion(String template, String[] values) {
 		super(template, values);
+	}
+
+	public static CalculusQuestion randomIntegral(int highestPower, int numOfTerms, int numOfVariables) {
+		String polynomial = randomIntegerPolynomial(highestPower, numOfTerms, numOfVariables);
+		if (eventOccurs(0.5)) {
+			polynomial = exp(polynomial);
+		}
+		String differentials = "";
+		for (int i = 0; i < numOfVariables; i++) {
+			differentials += "d" + variables[i];
+		}
+		String integral = polynomial + differentials;
+		String template = "Find the integral of <0>";
+		CalculusQuestion cq = new CalculusQuestion(template, new String[] { integral });
+		return cq;
+	}
+
+	public static CalculusQuestion randomPartialDerivative(int highestPower, int numOfTerms, int numOfVariables) {
+		String polynomial = randomIntegerPolynomial(highestPower, numOfTerms, numOfVariables);
+		if (eventOccurs(0.5)) {
+			polynomial = exp(polynomial);
+		}
+		int randomIndex = randomInteger(0, numOfVariables);
+		String withRespectTo = "" + variables[randomIndex];
+		String template = "Find the derivative of <0> with respect to <1>";
+		CalculusQuestion cq = new CalculusQuestion(template, new String[] { polynomial, withRespectTo });
+		return cq;
 	}
 
 	public static String randomIntegerPolynomial(int highestPower, int numOfTerms, int numOfVariables) {
@@ -23,6 +54,12 @@ public class CalculusQuestion extends Question {
 		List<Integer> constants = generateIntegerConstants(numOfTerms);
 
 		return buildPolynomial(constants, powers, numOfVariables);
+	}
+
+	public static String exp(String power) {
+		power = "(" + power + ")";
+		String exp = "e^" + power;
+		return exp;
 	}
 
 	public static <T extends Number> String buildPolynomial(List<T> constants, List<T> powers, int numOfVariables)
@@ -44,7 +81,7 @@ public class CalculusQuestion extends Question {
 			}
 			for (int j = 0; j < numOfVariables; j++) {
 				char varLetter = variables[j];
-				int powerIndex = i * j + i;
+				int powerIndex = i * numOfVariables + j;
 
 				if (powers.get(powerIndex).doubleValue() == 0d) {
 					polynomial += "";
@@ -78,12 +115,13 @@ public class CalculusQuestion extends Question {
 		int currentPower = highestPower;
 
 		while (termCount < totalPowers) {
-			if (eventOccurs(.5)) {
+			if (eventOccurs(.50)) {
 				powers.add(currentPower);
 				termCount++;
 				currentPower--;
 			}
-			double prob = (totalPowers / ((double) totalPowers + termCount));
+			double prob = (termCount / ((double) 2 * totalPowers));
+			// prob = .25;
 			if (eventOccurs(prob)) {
 				currentPower--;
 			}
